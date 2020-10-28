@@ -38,82 +38,72 @@ Graph:: Graph(int s, int e){
 int** Graph::initMatrix(int**matrix, int row, int column){
    srand(time(NULL));
    matrix = new int*[row];
-   for(int i =0; i < row; i++)
-       matrix[i] = new int[column];
+   for(int i =0; i < row; i++) matrix[i] = new int[column];
+   for(int i =0; i < row; i++){
+     for(int j =0; j < column; j++) matrix[i][j] = 0;
+   }
    return matrix;
 }
 
 void Graph::generAdjacencyMatrix(){ 
-for(int i =0; i < numberNodes ; i++){
-    int k = 0;
-   for(int  j =0; j < numberNodes; j++){
-      if(k < maxDeegreesNode) graph[i][j] = graph[j][i] = rand()%2;
-      else  graph[i][j] = graph[j][i] = 0;
-      if(graph[i][j] != 0) k++;
-      if(i == j) graph[i][j] = 0;
-   }
-}
-for(int i =0; i < numberNodes-1; i++){
-   graph[i][i+1] =  graph[i+1][i] = 1;
-}
-for(int i =0; i < numberNodes ; i++){
-   for(int  j =0; j < numberNodes; j++){
-     if(graph[i][j] == 1) graph[i][j] = graph[j][i] = minEdge + 1 +  rand()%(maxEdge-minEdge);
-   }
-}
+  int arrNumber[numberNodes];
+  vector<int> person;
+  for(int i =0; i < numberNodes; i++) arrNumber[i] = i;
+  int count;
+  if(maxDeegreesNode/2 >2 ) count = maxDeegreesNode/2; else count = 2;
+  for(int i =0; i < maxDeegreesNode/2; i++){
+     for (int j = 0; j < numberNodes/2; j++){
+        int a = rand()%numberNodes;//місця які міняємо
+        int b =  rand()%numberNodes;
+        int c = arrNumber[a];
+        arrNumber[a] = arrNumber[b];
+        arrNumber[b] = c;
+     }
+     for(int j =0; j < numberNodes-1; j++)
+       graph[arrNumber[j]][arrNumber[j+1]] = graph[arrNumber[j+1]][arrNumber[j]] = minEdge+1+rand()%(maxEdge-minEdge);
+     for(int j =0; j < numberNodes; j++)
+       cout<<arrNumber[j]<<"--";
+     cout<<endl;
+     int indexS =0,  indexE = 0;
+     for (int j = 0; j < numberNodes; j++){
+      if (arrNumber[j] == start)indexS = j;
+      if ( arrNumber[j] == end)indexE = j;
+     }
+     if(indexE > indexS){
+        person.push_back(arrNumber[indexS]);
+        while (indexE != indexS){
+          indexS++;
+          person.push_back(arrNumber[indexS]);
+        }
+     }else{
+         person.push_back(arrNumber[indexS]);
+        while (indexE != indexS){
+          indexS--;
+          person.push_back(arrNumber[indexS]);
+        }
+     }
+     population.push_back(person);
+     person.clear();
+  }
 }
 
 void Graph::startPopulation(){
-    vector<int> buf;
-    vector<int> person;
-    bool check[numberNodes];
-    for(int i =0; i < numberNodes; i++){
-        check[i] = false;
-    }
-    check[start] = true;
-  //  while (population.size() < numberPopulation){ 
-     int temp = start;
-     person.push_back(temp);
-       while (temp != end){
-          for(int i =0; i < numberNodes; i++){
-              if(graph[temp][i] != 0 && !check[i]) buf.push_back(i);
-          }
-          if(buf.size()!= 0){
-               int b = buf[0];
-          for(int i =0; i < buf.size(); i++){
-              if(b>= buf[i]) {
-                  b = buf[i];
-                  check[b] = true;
-              }
-          }
-          buf.clear(); 
-          person.push_back(b);
-          temp =b;
-          }else{
-            person.pop_back();
-            temp = person[person.size()-1];
-          }
-       }
-       population.push_back(person);
-       for(int i =0; i < person.size(); i++){
-           cout<<person[i]+1<<"-->";
-       }
-  //  }
-    
+   
 }
 
 int main(){
-    int num = 12;
-    int d = 7;
-  int minEdge = 5;
-  int maxEdge = 150;
   Graph ggraph(1, 7);
   ggraph.generAdjacencyMatrix();
-  ggraph.startPopulation();
-  /*for(int i =0; i < ggraph.numberNodes ; i++){
+  for(int i =0; i < ggraph.population.size(); i++){
+    for(int j =0; j < ggraph.population[i].size(); j++){
+      cout<<ggraph.population[i][j]<<"-->";
+    }
+    cout<<endl;
+  }
+  for(int i =0; i < ggraph.numberNodes ; i++){
    for(int  j =0; j < ggraph.numberNodes; j++){
       cout<<setw(4)<<ggraph.graph[i][j];
    }
    cout<<endl;
-  }*/
+  }
 }
