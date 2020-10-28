@@ -13,18 +13,21 @@ class Graph{
   Graph(int s, int e);
   int** initMatrix(int**matrix, int row, int columns);
   void generAdjacencyMatrix();
-  void startPopulation();
+  void funcDef();
+  
 
 
   //variaties
   int start;
   int end;
-  int numberNodes = 12;
-  int maxDeegreesNode = 8;
+  int numberNodes = 20;
+  int maxDeegreesNode = 10;
   int minEdge = 5;
   int maxEdge = 150;
   int**graph;
   vector<vector<int>> population;
+  int* funcMin;
+  int record =0;
   int numberPopulation = 2;
 
 };
@@ -85,15 +88,28 @@ void Graph::generAdjacencyMatrix(){
      population.push_back(person);
      person.clear();
   }
+  funcMin = new int[population.size()];
 }
 
-void Graph::startPopulation(){
-   
+void Graph::funcDef(){
+   int sum;
+   for(int i =0; i < population.size(); i++){
+     sum = 0;
+     for(int j =0; j < population[i].size()-1; j++){
+       sum+=graph[population[i][j]][population[i][j+1]];
+     }
+     funcMin[i] = sum;
+   }
 }
 
 int main(){
   Graph ggraph(1, 7);
   ggraph.generAdjacencyMatrix();
+  ggraph.funcDef();
+  for(int i =0; i < ggraph.population.size(); i++){
+    cout<<ggraph.funcMin[i]<<"-";
+  }
+  cout<<endl;
   for(int i =0; i < ggraph.population.size(); i++){
     for(int j =0; j < ggraph.population[i].size(); j++){
       cout<<ggraph.population[i][j]<<"-->";
