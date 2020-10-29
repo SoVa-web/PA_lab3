@@ -26,11 +26,11 @@ class Graph{
   //variaties
   int start;
   int end;
-  int numberNodes = 25;
+  int numberNodes = 20;
   int maxDeegreesNode = 10;
   int minEdge = 5;
   int maxEdge = 150;
-  int nuumberPoints  = 2;
+  int nuumberPoints  = 1;
   int numberMutation = 2;
   int numberBetter = 2;
   int**graph;
@@ -72,9 +72,6 @@ void Graph::generAdjacencyMatrix(){
      }
      for(int j =0; j < numberNodes-1; j++)
        graph[arrNumber[j]][arrNumber[j+1]] = graph[arrNumber[j+1]][arrNumber[j]] = minEdge+1+rand()%(maxEdge-minEdge);
-     for(int j =0; j < numberNodes; j++)
-       cout<<arrNumber[j]<<"--";
-     cout<<endl;
      int indexS =0,  indexE = 0;
      for (int j = 0; j < numberNodes; j++){
       if (arrNumber[j] == start)indexS = j;
@@ -141,19 +138,59 @@ void Graph::crossover(){
     cout<<funcMin[i]<<"-";
   }
   cout<<endl;
+  vector<vector<int>> setChield;
   int firstParent = maxInPop();
   cout<<"max"<<firstParent<<endl;
   int secondParent = minInPop();  
   cout<<"min"<<secondParent<<endl;
   vector<int> firstSet = potentialCross(population[firstParent], population[secondParent]);//непарні від макс
   vector<int> secondSet = potentialCross(population[secondParent], population[firstParent]);//парні від макс
-  /*for(int i =0; i < firstSet.size(); i++)
+   for(int i =0; i < firstSet.size(); i++)
    cout<<firstSet[i]<<"  ";
    cout<<"firstSet"<<endl;
   for(int j =0; j < secondSet.size(); j++){
     cout<<secondSet[j]<<"  ";
   }
-  cout<<"secod"<<endl;*/
+  cout<<"secod"<<endl;
+  if(firstSet.size()/2 >= nuumberPoints){
+    vector<int> ch1;
+    vector<int> ch2;
+    vector<int> buf;
+    int t =1, k =1;
+     ch1.push_back(start);
+     ch2.push_back(start);
+    for (int i = 0; i < nuumberPoints; i++){
+      while (t <= firstSet[2*i]){
+        ch1.push_back(population[firstParent][t]);
+        t++;
+      }
+      while (k <= firstSet[2*i+1]){
+        ch2.push_back(population[secondParent][k]);
+       k++;
+      }
+      buf = ch1;
+      ch1 = ch2;
+      ch2 = buf;
+    }
+     while (t != population[firstParent].size()){
+        ch1.push_back(population[firstParent][t]);
+        t++;
+      }
+      while (k != population[secondParent].size()){
+        ch2.push_back(population[secondParent][k]);
+       k++;
+      }
+      cout<<"ch1"<<endl;
+      for(int i =0; i < ch1.size(); i++){
+        cout<<ch1[i]<<"*";
+      }
+      cout<<endl;
+      cout<<"ch2"<<endl;
+      for(int i =0; i < ch2.size(); i++){
+        cout<<ch2[i]<<"*";
+      }
+      cout<<endl;
+  }
 }
 
 vector<int> Graph::potentialCross(vector<int> a, vector<int> b){
