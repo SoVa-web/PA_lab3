@@ -27,17 +27,18 @@ class Graph{
   int start;
   int end;
   int numberNodes = 20;
-  int maxDeegreesNode = 10;
+  int maxDeegreesNode = 15;
   int minEdge = 5;
   int maxEdge = 150;
   int nuumberPoints  = 1;
-  int numberMutation = 2;
-  int numberBetter = 2;
+  int numberMutation = 1;
+  int numberBetter = 1;
   int**graph;
   vector<vector<int>> population;
   int* funcMin;
   int record =0;
-
+  vector<int> person;
+  vector<int> firstSet;
 };
 
 Graph:: Graph(int s, int e){
@@ -58,7 +59,6 @@ int** Graph::initMatrix(int**matrix, int row, int column){
 
 void Graph::generAdjacencyMatrix(){ 
   int arrNumber[numberNodes];
-  vector<int> person;
   for(int i =0; i < numberNodes; i++) arrNumber[i] = i;
   int count;
   if(maxDeegreesNode/2 >2 ) count = maxDeegreesNode/2; else count = 2;
@@ -134,18 +134,9 @@ int index;
 }
 
 void Graph::crossover(){
-   for(int i =0; i < population.size(); i++){
-    cout<<funcMin[i]<<"-";
-  }
-  cout<<endl;
   int firstParent = maxInPop();
-  cout<<"max"<<firstParent<<endl;
   int secondParent = minInPop();  
-  cout<<"min"<<secondParent<<endl;
-  vector<int> firstSet = potentialCross(population[firstParent], population[secondParent]);//непарні від макс
-   for(int i =0; i < firstSet.size(); i++)
-   cout<<firstSet[i]<<"  ";
-   cout<<"firstSet"<<endl;
+   firstSet = potentialCross(population[firstParent], population[secondParent]);
   if(firstSet.size()/2 >= nuumberPoints){
     vector<int> ch1;
     vector<int> ch2;
@@ -221,12 +212,8 @@ void Graph::crossover(){
         population[index] = ch2;
       }
       funcDef();
-      ////
-      for(int i =0; i < population.size(); i++){
-    cout<<funcMin[i]<<"-";
   }
-  cout<<endl;
-  }
+  firstSet.clear();
 }
 
 vector<int> Graph::potentialCross(vector<int> a, vector<int> b){
@@ -251,9 +238,7 @@ void Graph::mutation(){
         check[i] = true;
     }
   int indexPerson = rand()%population.size();
-  cout<<"mutOs"<<indexPerson<<endl;
   int indexPlaceMutation = rand()%population[indexPerson].size();
-  cout<<"mut"<<indexPlaceMutation<<endl;
   vector<int> newPerson;
   for(int i =0; i < indexPlaceMutation; i++){
     newPerson.push_back(population[indexPerson][i]);
@@ -314,28 +299,41 @@ check[population[indexPerson][indexPlaceMutation]] = false;
       funcDef();
 }
 
+void Graph::better(){
+    for (int i = 0; i < population.size(); i++)
+        for (int j = 2; j < population[i].size(); j++)
+            if (graph[population[i][j - 2]][population[i][j]] != 0 &&
+                graph[population[i][j - 2]][population[i][j]] < graph[population[i][j - 2]][population[i][j - 1]] + graph[population[i][j - 1]][population[i][j]])
+            {
+                population[i].erase(population[i].begin() + j - 1);
+                j--;
+            }
+funcDef();
+}
+
 int main(){
   Graph ggraph(1, 7);
   ggraph.generAdjacencyMatrix();
   ggraph.funcDef();
-  for(int i =0; i < ggraph.population.size(); i++){
-    for(int j =0; j < ggraph.population[i].size(); j++){
-      cout<<ggraph.population[i][j]<<"-->";
-    }
-    cout<<endl;
-  }
- // ggraph.crossover();
- ggraph.mutation();
- for(int i =0; i < ggraph.population.size(); i++){
-    for(int j =0; j < ggraph.population[i].size(); j++){
-      cout<<ggraph.population[i][j]<<"-->";
-    }
-    cout<<endl;
-  }
-  /*for(int i =0; i < ggraph.numberNodes ; i++){
+   cout<<"Graph : "<<endl;
+  for(int i =0; i < ggraph.numberNodes ; i++){
    for(int  j =0; j < ggraph.numberNodes; j++){
       cout<<setw(4)<<ggraph.graph[i][j];
    }
    cout<<endl;
-  }*/
+  }
+  int index =0;
+  for(int i =0; i < 20; i++){
+     ggraph.crossover();
+ for(int i =0; i < ggraph.numberMutation; i++){
+   ggraph.mutation();
+ }
+ for(int i =0; i < ggraph.numberBetter; i++){
+   ggraph.better();
+ }
+ ggraph.funcDef();
+  index = ggraph.minInPop();
+  cout<<ggraph.funcMin[index]<<endl;
+  }
+ 
 }
