@@ -17,16 +17,15 @@ class Graph{
   vector<int> potentialCross(vector<int> a, vector<int> b); 
   void mutation();
   void better();
+  bool alive(vector<int> ch);
   void funcDef();
   int minInPop();
   int maxInPop();
   
-
-
   //variaties
   int start;
   int end;
-  int numberNodes = 20;
+  int numberNodes = 300;
   int maxDeegreesNode = 15;
   int minEdge = 5;
   int maxEdge = 150;
@@ -134,13 +133,10 @@ int index;
 }
 
 void Graph::crossover(){
-  int firstParent = maxInPop();
-  int secondParent = minInPop();  
+  int firstParent = maxInPop(), secondParent = minInPop();  
    firstSet = potentialCross(population[firstParent], population[secondParent]);
   if(firstSet.size()/2 >= nuumberPoints){
-    vector<int> ch1;
-    vector<int> ch2;
-    vector<int> buf;
+    vector<int> ch1, ch2, buf;
     int t =1, k =1;
      ch1.push_back(start);
      ch2.push_back(start);
@@ -165,33 +161,9 @@ void Graph::crossover(){
         ch2.push_back(population[secondParent][k]);
        k++;
       }
-      ///////
       bool areYouAlive1, areYouAlive2;
-      for(int i =0; i < ch1.size(); i++){//винести в функцію
-       for(int j =0; j <ch1.size(); j++){
-          if(i != j && ch1[i] == ch1[j]){
-            areYouAlive1 = false;
-            break;
-          }else{
-            areYouAlive1 = true;
-          }
-       }
-       if(!areYouAlive1)
-       break;
-      }
-      for(int i =0; i < ch2.size(); i++){//винести в функцію
-       for(int j =0; j <ch2.size(); j++){
-          if(i != j && ch2[i] == ch2[j]){
-             areYouAlive2 = false;
-             break;
-          }else{
-             areYouAlive2 = true;
-          }
-       }
-       if(!areYouAlive2)
-       break;
-      }
-      //////
+      areYouAlive1 = alive(ch1);
+      areYouAlive2 = alive(ch2);
       int func1=0, func2=0;
       for(int j =0; j < ch1.size()-1; j++){
        func1+=graph[ch1[j]][ch1[j+1]];
@@ -199,7 +171,6 @@ void Graph::crossover(){
       for(int j =0; j < ch2.size()-1; j++){
        func2+=graph[ch2[j]][ch2[j+1]];
       }
-      /////
       if(areYouAlive1){
         int index = maxInPop();
         if(funcMin[index] > func1)
@@ -214,6 +185,23 @@ void Graph::crossover(){
       funcDef();
   }
   firstSet.clear();
+}
+
+bool Graph::alive(vector<int> ch){
+   bool areYouAlive1;
+      for(int i =0; i < ch.size(); i++){//винести в функцію
+       for(int j =0; j <ch.size(); j++){
+          if(i != j && ch[i] == ch[j]){
+            areYouAlive1 = false;
+            break;
+          }else{
+            areYouAlive1 = true;
+          }
+       }
+       if(!areYouAlive1)
+       break;
+      }
+      return areYouAlive1;
 }
 
 vector<int> Graph::potentialCross(vector<int> a, vector<int> b){
@@ -232,72 +220,8 @@ vector<int> Graph::potentialCross(vector<int> a, vector<int> b){
   return res;
 }
 
-void Graph::mutation(){
-  bool check[numberNodes];
-    for(int i =0; i < numberNodes; i++){
-        check[i] = true;
-    }
-  int indexPerson = rand()%population.size();
-  int indexPlaceMutation = rand()%population[indexPerson].size();
-  vector<int> newPerson;
-  for(int i =0; i < indexPlaceMutation; i++){
-    newPerson.push_back(population[indexPerson][i]);
-    check[population[indexPerson][indexPlaceMutation]] = false;
-  }
-  ///
-  int temp = population[indexPerson][indexPlaceMutation];
-  newPerson.push_back(temp);
-check[population[indexPerson][indexPlaceMutation]] = false;
-  vector<int> buf;
-   while (temp != end){
-        for(int i =0; i < numberNodes; i++){
-            if(temp != i && check[i] ){
-              buf.push_back(i);
-            }
-        }
-        if(buf.size() > 0){
-           int dist = graph[temp][buf[0]];
-        int k =temp;
-       for(int i =0; i < buf.size(); i++){
-          if(dist >= graph[temp][buf[i]]){
-              dist = graph[temp][buf[i]];
-              k = buf[i];
-          }
-       }
-       temp =k;
-        check[temp] = false;
-        newPerson.push_back(temp);
-        buf.clear();
-        }
-    }
-       ////
-          bool areYouAlive1;
-      for(int i =0; i < newPerson.size(); i++){//винести в функцію
-       for(int j =0; j <newPerson.size(); j++){
-          if(i != j && newPerson[i] == newPerson[j]){
-            areYouAlive1 = false;
-            break;
-          }else{
-            areYouAlive1 = true;
-          }
-       }
-       if(!areYouAlive1)
-       break;
-      }
-       ////
-        int func1=0;
-      for(int j =0; j < newPerson.size()-1; j++){
-       func1+=graph[newPerson[j]][newPerson[j+1]];
-      }
-       
-         if(areYouAlive1){
-            int index = maxInPop();
-        if(funcMin[index] > func1)
-        population[index] = newPerson;
-         }
-        
-      funcDef();
-}
+/*void Graph::mutation(){
+}*/
 
 void Graph::better(){
     for (int i = 0; i < population.size(); i++)
@@ -316,24 +240,28 @@ int main(){
   ggraph.generAdjacencyMatrix();
   ggraph.funcDef();
    cout<<"Graph : "<<endl;
-  for(int i =0; i < ggraph.numberNodes ; i++){
+  /*for(int i =0; i < ggraph.numberNodes ; i++){
    for(int  j =0; j < ggraph.numberNodes; j++){
       cout<<setw(4)<<ggraph.graph[i][j];
    }
    cout<<endl;
-  }
+  }*/
   int index =0;
   for(int i =0; i < 20; i++){
      ggraph.crossover();
  for(int i =0; i < ggraph.numberMutation; i++){
-   ggraph.mutation();
+   //ggraph.mutation();
  }
  for(int i =0; i < ggraph.numberBetter; i++){
    ggraph.better();
  }
  ggraph.funcDef();
   index = ggraph.minInPop();
-  cout<<ggraph.funcMin[index]<<endl;
+  cout<<" Вага : "<<ggraph.funcMin[index]<<endl;
+  cout<<" Шлях : "<<endl;
+  for(int i =0; i < ggraph.population[index].size(); i++){
+    cout<< ggraph.population[index][i]<<"-->";
   }
- 
+  cout<<endl;
+  }
 }
